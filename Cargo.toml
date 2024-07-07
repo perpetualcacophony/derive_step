@@ -7,3 +7,5 @@ edition = "2021"
 proc_macro = true
 
 [dependencies]
+manyhow = "0.11.1"
+syn = { version = "2.0.69", features = ["full"] }
