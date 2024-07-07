@@ -12,5 +12,10 @@ exclude = ["/tests"]
 proc-macro = true
 
 [dependencies]
-manyhow = "0.11.1"
-syn = { version = "2.0.69", features = ["full"] }
+manyhow = "~0.11"
+syn = { version = "~2.0", features = [
+    "derive",
+    "printing",
+    "proc-macro",
+    "full",
+], default-features = false }

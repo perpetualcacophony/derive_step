@@ -2,11 +2,11 @@
 #![feature(step_trait)]
 #![feature(iter_map_windows)]
 
-use manyhow::{bail, ensure, manyhow, Result};
+use manyhow::{bail, ensure, manyhow};
 use syn::spanned::Spanned;
 
 #[manyhow(proc_macro_derive(Step))]
-pub fn derive_step(input: syn::DeriveInput) -> Result<syn::ItemImpl> {
+pub fn derive_step(input: syn::DeriveInput) -> manyhow::Result<syn::ItemImpl> {
     if let syn::Data::Enum(ref data) = input.data {
         ensure!(
             !data.variants.is_empty(),
