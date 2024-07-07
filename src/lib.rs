@@ -20,6 +20,13 @@ pub fn derive_step(input: syn::DeriveInput) -> manyhow::Result<syn::ItemImpl> {
             "Using this derive for an enum with variant fields is unsupported."
         );
 
+        ensure!(
+            data.variants.len() != 1,
+            "Using this derive for an enum with a single variant is unsupported."
+        );
+
+        ensure!(data.variants.len() != 2, "Using this derive for an enum with only two variants is currently unsupported. If you happen to need this behavior, please open an issue! I don't currently see a use, and I don't feel like hunting down the nasty bug it's causing right now.");
+
         let successors =
             data.variants
                 .iter()
@@ -35,12 +42,12 @@ pub fn derive_step(input: syn::DeriveInput) -> manyhow::Result<syn::ItemImpl> {
         let predecessors =
             data.variants
                 .iter()
-                .skip(1)
+                .rev()
                 .map_windows(|variants: &[&syn::Variant; 2]| -> syn::Arm {
-                    let start = &variants[1].ident;
-                    let predecessor = &variants[0].ident;
+                    let start = &variants[0].ident;
+                    let predecessor = &variants[1].ident;
 
-                    syn::parse_quote_spanned! {variants[1].span()=>
+                    syn::parse_quote_spanned! {variants[0].span()=>
                         Self::#start => Some(Self::#predecessor)
                     }
                 });
