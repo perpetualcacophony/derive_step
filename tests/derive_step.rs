@@ -11,3 +11,9 @@ pub enum MyEnum {
 
 #[allow(dead_code)]
 const MY_ENUM_RANGE: std::ops::RangeInclusive<MyEnum> = MyEnum::A..=MyEnum::C;
+
+#[test]
+fn steps_between() {
+    use std::iter::Step;
+    assert_eq!(Step::steps_between(&MyEnum::A, &MyEnum::C), Some(2))
+}
