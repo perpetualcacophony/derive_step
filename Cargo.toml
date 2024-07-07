@@ -2,9 +2,14 @@
 name = "derive_step"
 version = "0.1.0"
 edition = "2021"
+license-file = "LICENSE.txt"
+authors = ["perpetualcacophony"]
+description = "A derive macro for the unstable Step trait."
+repository = "https://github.com/perpetualcacophony/derive_step"
+exclude = ["/tests"]
 
 [lib]
-proc_macro = true
+proc-macro = true
 
 [dependencies]
 manyhow = "0.11.1"
