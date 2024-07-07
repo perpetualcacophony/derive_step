@@ -1,3 +1,4 @@
+#![no_std]
 #![feature(step_trait)]
 #![feature(iter_map_windows)]
 
@@ -19,32 +20,30 @@ pub fn derive_step(input: syn::DeriveInput) -> Result<syn::ItemImpl> {
             "Using this derive for an enum with variant fields is unsupported."
         );
 
-        let successors: Vec<syn::Arm> = data
-            .variants
-            .iter()
-            .map_windows(|variants: &[&syn::Variant; 2]| {
-                let start = &variants[0].ident;
-                let successor = &variants[1].ident;
+        let successors =
+            data.variants
+                .iter()
+                .map_windows(|variants: &[&syn::Variant; 2]| -> syn::Arm {
+                    let start = &variants[0].ident;
+                    let successor = &variants[1].ident;
 
-                syn::parse_quote_spanned! {variants[0].span()=>
-                    Self::#start => Some(Self::#successor)
-                }
-            })
-            .collect();
+                    syn::parse_quote_spanned! {variants[0].span()=>
+                        Self::#start => Some(Self::#successor)
+                    }
+                });
 
-        let predecessors: Vec<syn::Arm> = data
-            .variants
-            .iter()
-            .skip(1)
-            .map_windows(|variants: &[&syn::Variant; 2]| {
-                let start = &variants[1].ident;
-                let predecessor = &variants[0].ident;
+        let predecessors =
+            data.variants
+                .iter()
+                .skip(1)
+                .map_windows(|variants: &[&syn::Variant; 2]| -> syn::Arm {
+                    let start = &variants[1].ident;
+                    let predecessor = &variants[0].ident;
 
-                syn::parse_quote_spanned! {variants[1].span()=>
-                    Self::#start => Some(Self::#predecessor)
-                }
-            })
-            .collect();
+                    syn::parse_quote_spanned! {variants[1].span()=>
+                        Self::#start => Some(Self::#predecessor)
+                    }
+                });
 
         let name = &input.ident;
 
