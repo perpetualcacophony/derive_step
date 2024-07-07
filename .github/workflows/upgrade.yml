@@ -1,0 +1,26 @@
+name: Upgrade dependencies
+
+on:
+    schedule:
+        - cron: "0 0 * * 0"
+
+jobs:
+  cargo-upgrade:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+  
+      - name: Install rust
+        uses: dtolnay/rust-toolchain@nightly
+  
+      - name: Cache rust
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run cargo-upgrade
+        uses: meysam81/cargo-upgrade-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
