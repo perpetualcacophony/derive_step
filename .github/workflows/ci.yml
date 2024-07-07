@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    paths-ignore:
+      - README.md
+      - LICENSE.txt
+    branches: [main]
+
+  pull_request:
+    types: [opened, synchronize, reopened]
+    
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:    
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install rust
+      uses: dtolnay/rust-toolchain@nightly
+
+    - name: Cache rust
+      uses: Swatinem/rust-cache@v2
+
+    - name: Build
+      run: cargo build
+
+    - name: Run tests
+      run: cargo test
