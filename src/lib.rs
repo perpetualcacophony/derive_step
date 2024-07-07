@@ -19,19 +19,20 @@ pub fn derive_step(input: syn::DeriveInput) -> Result<syn::ItemImpl> {
             "Using this derive for an enum with variant fields is unsupported."
         );
 
-        let successors: impl Iterator<Item = syn::Arm> =
-            data.variants
-                .iter()
-                .map_windows(|variants: &[&syn::Variant; 2]| {
-                    let start = &variants[0].ident;
-                    let successor = &variants[1].ident;
+        let successors: Vec<syn::Arm> = data
+            .variants
+            .iter()
+            .map_windows(|variants: &[&syn::Variant; 2]| {
+                let start = &variants[0].ident;
+                let successor = &variants[1].ident;
 
-                    syn::parse_quote_spanned! {variants[0].span()=>
-                        Self::#start => Some(Self::#successor)
-                    }
-                });
+                syn::parse_quote_spanned! {variants[0].span()=>
+                    Self::#start => Some(Self::#successor)
+                }
+            })
+            .collect();
 
-        let predecessors: impl Iterator<Item = syn::Arm> = data
+        let predecessors: Vec<syn::Arm> = data
             .variants
             .iter()
             .skip(1)
@@ -42,23 +43,44 @@ pub fn derive_step(input: syn::DeriveInput) -> Result<syn::ItemImpl> {
                 syn::parse_quote_spanned! {variants[1].span()=>
                     Self::#start => Some(Self::#predecessor)
                 }
-            });
+            })
+            .collect();
 
         let name = &input.ident;
 
-        let expanded = syn::parse_quote!(
+        let expanded = syn::parse_quote_spanned!(input.span()=>
             impl std::iter::Step for #name {
                 fn forward_checked(start: Self, count: usize) -> Option<Self> {
-                    match start {
-                        #(#successors),*
+                    let next = match start {
+                        #(#successors),*,
                         _ => None
+                    };
+
+                    if let Some(next) = next {
+                        if count == 1 {
+                            Some(next)
+                        } else {
+                            Self::forward_checked(next, count - 1)
+                        }
+                    } else {
+                        None
                     }
                 }
 
                 fn backward_checked(start: Self, count: usize) -> Option<Self> {
-                    match start {
-                        #(#predecessors),*
+                    let next = match start {
+                        #(#predecessors),*,
                         _ => None
+                    };
+
+                    if let Some(next) = next {
+                        if count == 1 {
+                            Some(next)
+                        } else {
+                            Self::backward_checked(next, count - 1)
+                        }
+                    } else {
+                        None
                     }
                 }
 
@@ -67,17 +89,17 @@ pub fn derive_step(input: syn::DeriveInput) -> Result<syn::ItemImpl> {
                     if start == end { return Some(0); }
 
                     let mut counter = 1;
-                    let mut current = start.clone().forward_checked();
+                    let mut current = Self::forward_checked(start.clone(), 1);
 
-                    while current != Some(end) && current.is_some() {
+                    while current.as_ref() != Some(end) && current.is_some() {
                         counter += 1;
-                        current = current.unwrap().forward_checked()
+                        current = Self::forward_checked(current.unwrap(), 1);
                     }
 
-                    if current == Some(end) {
-                        Some(counter)
+                    if current.as_ref() == Some(end) {
+                        return Some(counter);
                     } else {
-                        None
+                        return None;
                     }
                 }
             }
