@@ -21,6 +21,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Bump version to beta
+      uses: jacobtomlinson/gha-find-replace@v3
+      with:
+        find: "0.0.0-alpha"
+        replace: "0.0.0-beta"
+        include: "Cargo.toml"
+        regex: false
+
     - name: Install rust
       uses: dtolnay/rust-toolchain@nightly
 
