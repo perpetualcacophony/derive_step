@@ -1,0 +1,30 @@
+name: Publish to crates.io
+
+on:
+  push:
+    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
+    
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps: 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update manifest version
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "0.0.0-alpha"
+          replace: "${${{ github.action_ref }}/v/}"
+          include: "Cargo.toml"
+          regex: false
+
+      - name: Install rust
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Cache rust
+        uses: Swatinem/rust-cache@v2
+
+      - name: Publish
+        run: cargo publish
