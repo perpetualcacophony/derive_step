@@ -19,7 +19,7 @@ jobs:
         run: VERSION=${GIT_REF/v/}
 
       - name: Echo version
-        run: echo $VERSION
+        run: echo "$VERSION"
 
       - name: Update manifest version
         run: sed -i "s/0.0.0-alpha/$VERSION/" Cargo.toml
