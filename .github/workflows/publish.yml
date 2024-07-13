@@ -28,4 +28,4 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Publish
-        run: cargo publish
+        run: cargo publish --allow-dirty
