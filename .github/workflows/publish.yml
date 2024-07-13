@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set version variable
-        run: VERSION=${${{github.ref_name}}/v/}
+        run: echo "VERSION=${${{github.ref_name}}/v/}"
 
       - name: Update manifest version
         uses: jacobtomlinson/gha-find-replace@v3
