@@ -8,15 +8,18 @@ jobs:
   publish:
     runs-on: ubuntu-latest
 
-    steps: 
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set version variable
+        run: VERSION=${${{github.ref_name}}/v/}
 
       - name: Update manifest version
         uses: jacobtomlinson/gha-find-replace@v3
         with:
-          find: "0.0.0-alpha"
-          replace: "${${{ github.action_ref }}/v/}"
+          find: 0.0.0-alpha
+          replace: $VERSION
           include: "Cargo.toml"
           regex: false
 
