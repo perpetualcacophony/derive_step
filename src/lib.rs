@@ -57,6 +57,10 @@ pub fn derive_step(input: syn::DeriveInput) -> manyhow::Result<syn::ItemImpl> {
         let expanded = syn::parse_quote_spanned!(input.span()=>
             impl std::iter::Step for #name {
                 fn forward_checked(start: Self, count: usize) -> Option<Self> {
+                    if count == 0 {
+                        return Some(start)
+                    }
+
                     let next = match start {
                         #(#successors),*,
                         _ => None
@@ -74,6 +78,10 @@ pub fn derive_step(input: syn::DeriveInput) -> manyhow::Result<syn::ItemImpl> {
                 }
 
                 fn backward_checked(start: Self, count: usize) -> Option<Self> {
+                    if count == 0 {
+                        return Some(start)
+                    }
+
                     let next = match start {
                         #(#predecessors),*,
                         _ => None
