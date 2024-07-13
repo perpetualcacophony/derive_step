@@ -15,7 +15,7 @@ macro_rules! test_steps_between {
         paste::paste!{
         mod steps_between {
             use std::iter::Step;
-            use super::MyEnum;
+            use super::$enum;
 
         $(
             #[test]
@@ -46,10 +46,40 @@ test_steps_between! { MyEnum=>
     C, C => Some(0)
 }
 
-#[test]
-fn forward() {
-    use std::iter::Step;
-    assert_eq!(Step::forward_checked(MyEnum::A, 1), Some(MyEnum::B));
-    assert_eq!(Step::forward_checked(MyEnum::A, 2), Some(MyEnum::C));
-    assert_eq!(Step::forward_checked(MyEnum::A, 3), None);
+macro_rules! test_forward {
+    {$enum:ident=> $($first:ident, $steps:literal => $expected:expr),+} => {
+        paste::paste!{
+        mod forward {
+            use std::iter::Step;
+            use super::$enum;
+
+            $(
+
+            #[test]
+            #[allow(non_snake_case)]
+            fn [< $first _ $steps >]() {
+                assert_eq!(
+                    Step::forward_checked($enum::$first, $steps),
+                    $expected
+                )
+            }
+
+            )+
+        }
+        }
+    };
+}
+
+test_forward! { MyEnum=>
+    A, 0 => Some(MyEnum::A),
+    A, 1 => Some(MyEnum::B),
+    A, 2 => Some(MyEnum::C),
+    A, 3 => None,
+
+    B, 0 => Some(MyEnum::B),
+    B, 1 => Some(MyEnum::C),
+    B, 2 => None,
+
+    C, 0 => Some(MyEnum::C),
+    C, 1 => None
 }
