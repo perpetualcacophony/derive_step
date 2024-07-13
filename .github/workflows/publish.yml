@@ -18,12 +18,7 @@ jobs:
         run: VERSION=${GIT_REF/v/}
 
       - name: Update manifest version
-        uses: jacobtomlinson/gha-find-replace@v3
-        with:
-          find: 0.0.0-alpha
-          replace: $VERSION
-          include: "Cargo.toml"
-          regex: false
+        run: sed "s/0.0.0-alpha/$VERSION/" Cargo.toml
 
       - name: Install rust
         uses: dtolnay/rust-toolchain@nightly
