@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GIT_REF: ${{github.ref_name}}
+      CARGO_REGISTRY_TOKEN: ${{secrets.CARGO_REGISTRY_TOKEN}}
 
     steps:
       - name: Checkout repository
