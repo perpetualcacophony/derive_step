@@ -7,13 +7,15 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      GIT_REF: ${{github.ref_name}}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set version variable
-        run: echo "VERSION=${${{github.ref_name}}/v/}"
+        run: VERSION=${GIT_REF/v/}
 
       - name: Update manifest version
         uses: jacobtomlinson/gha-find-replace@v3
