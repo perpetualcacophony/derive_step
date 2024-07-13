@@ -83,3 +83,41 @@ test_forward! { MyEnum=>
     C, 0 => Some(MyEnum::C),
     C, 1 => None
 }
+
+macro_rules! test_backward {
+    {$enum:ident=> $($first:ident, $steps:literal => $expected:expr),+} => {
+        paste::paste!{
+        mod backward {
+            use std::iter::Step;
+            use super::$enum;
+
+            $(
+
+            #[test]
+            #[allow(non_snake_case)]
+            fn [< $first _ $steps >]() {
+                assert_eq!(
+                    Step::backward_checked($enum::$first, $steps),
+                    $expected
+                )
+            }
+
+            )+
+        }
+        }
+    };
+}
+
+test_backward! { MyEnum=>
+    A, 0 => Some(MyEnum::A),
+    A, 1 => None,
+
+    B, 0 => Some(MyEnum::B),
+    B, 1 => Some(MyEnum::A),
+    B, 2 => None,
+
+    C, 0 => Some(MyEnum::C),
+    C, 1 => Some(MyEnum::B),
+    C, 2 => Some(MyEnum::A),
+    C, 3 => None
+}
