@@ -98,9 +98,9 @@ pub fn derive_step(input: syn::DeriveInput) -> manyhow::Result<syn::ItemImpl> {
                     }
                 }
 
-                fn steps_between(start: &Self, end: &Self) -> Option<usize> {
-                    if start > end { return None; }
-                    if start == end { return Some(0); }
+                fn steps_between(start: &Self, end: &Self) -> (usize, Option<usize>) {
+                    if start > end { return (0, None); }
+                    if start == end { return (0, Some(0)); }
 
                     let mut counter = 1;
                     let mut current = Self::forward_checked(start.clone(), 1);
@@ -111,9 +111,9 @@ pub fn derive_step(input: syn::DeriveInput) -> manyhow::Result<syn::ItemImpl> {
                     }
 
                     if current.as_ref() == Some(end) {
-                        return Some(counter);
+                        return (counter, Some(counter));
                     } else {
-                        return None;
+                        return (0, None);
                     }
                 }
             }

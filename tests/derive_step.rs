@@ -22,7 +22,7 @@ macro_rules! test_steps_between {
             #[allow(non_snake_case)]
             fn [< $first _ $second >]() {
                 assert_eq!(
-                    Step::steps_between(&$enum::$first, &$enum::$second),
+                    Step::steps_between(&$enum::$first, &$enum::$second).1,
                     $expected
                 )
             }
